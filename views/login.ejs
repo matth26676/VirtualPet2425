@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+</head>
+<body>
+    <a href='' id="FormBarOauth">Login with FormBar instead</a>
+    <form action="/login" method="post">
+        <div>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="user" required>
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="pass" required>
+        </div>
+        <div>
+            <button type="submit">Login</button>
+        </div>
+    </form>
+
+    <script>
+        const FBJS_URL = 'https://formbar.yorktechapps.com'
+        var THIS_URL = ''
+        
+        var headershost = JSON.parse(`<%- headershost %>`);
+
+        var requrl = JSON.parse(`<%- requrl %>`)
+        
+        THIS_URL = 'http://' + headershost + requrl
+        var REDIRECT_URL = `${FBJS_URL}/oauth?redirectURL=${THIS_URL}`
+
+        document.getElementById('FormBarOauth').href = REDIRECT_URL;
+        
+    </script>
+</body>
+</html>

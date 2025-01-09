@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+</head>
+<body>
+    <div id="mainPage">
+        <div id="contentBox" style="overflow-y: scroll;">
+            <div id="chatBox">
+
+            </div>
+            <div id="messageContainer">
+                    <input type="text" id="messageBox" placeholder="Type your message here">
+                    <button id="messageButton" onclick="">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        messageButton.addEventListener('click', () => {
+            const message = messageBox.value;
+            messageBox.value = '';
+            if (message.trim() === '') {
+                alert('Please enter a message');
+                return;
+            } else if (message.length > 512) {
+                alert('Please type a shorter message (max 512 characters)');
+                return;
+            }
+            let currentTime = new Date().toLocaleTimeString();
+            socket.emit('message', {currentTime: currentTime, content: message});
+        });
+
+        socket.on('message', message => {
+            console.log(message);
+            const messageElement = document.createElement('div');
+            if (message.sender) {
+                messageElement.innerText = ' At ' + message.date + ' in general, ' + message.sender + ' said: ' + message.content;
+            } else {
+                messageElement.innerText = message.content;
+            }
+            chatBox.appendChild(messageElement);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index</title>
+</head>
+<body>
+    <div>
+        <div>
+            
+        </div>
+    </div>
+    <script>
+        var session = JSON.parse(`<%- session %>`);
+        console.log(session);
+        
+        if (session && session.user) {
+            const user = session.user
+            const Username = document.createElement('h1');
+            Username.textContent = `Welcome ${user}!`;
+            document.body.appendChild(Username);
+            const chatLink = document.createElement('a');
+            chatLink.href = '/chat';
+            chatLink.textContent = 'Chat';
+            document.body.appendChild(chatLink);
+        } else {
+            const Guest = document.createElement('h1');
+            Guest.textContent = 'Welcome! Please login to use the Chat page';
+            document.body.appendChild(Guest);
+            const loginLink = document.createElement('a');
+            loginLink.href = '/login';
+            loginLink.textContent = 'Login';
+            document.body.appendChild(loginLink);
+        }
+    </script>
+</body>
+</html>
