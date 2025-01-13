@@ -91,6 +91,14 @@ function isAuthenticated(req, res, next) {
     }
 }
 
+function getpet(req, res) {
+    if (isAuthenticated) {
+        res.render('pet');
+    } else {
+        res.redirect('/login');
+    }
+}
+
 
 
 module.exports = {
@@ -98,5 +106,6 @@ module.exports = {
     getlogin,
     postlogin,
     getlogout,
-    getchat
+    getchat,
+    getpet
 }

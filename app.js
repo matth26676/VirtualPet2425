@@ -39,6 +39,8 @@ app.post('/login', (req, res) => routes.postlogin(req, res, db, crypto));
 
 app.get('/logout', routes.getlogout);
 
+app.get('/pet', routes.getpet);
+
 app.get('/chat', routes.getchat);
 
 io.on('connection', (socket) => sockets.connection(socket, io));
