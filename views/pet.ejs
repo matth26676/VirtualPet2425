@@ -30,15 +30,44 @@
                 <button id="playButton" onclick="">Play</button>
                 <button id="cleanButton" onclick="">Clean</button>
                 <div id="petSatiated"> 100% Satiated</div>
+                <div id="petHappiness"> 100% Happiness</div>
             </div>
         </div>
     </div>
     <script>
         var petSatiated = document.getElementById("petSatiated");
+        var petHappiness = document.getElementById("petHappiness");
         var petSatiatedValue = 100;
-        var PetHungerIncrement = setInterval(satiationDown, 1000);
+        var PetHungerIncrement = setInterval(satiationDown, 5000);
+        var PetHappinessDecrement = setInterval(happinessDown, 1000);
+        var petHappinessValue = 100;
         var feedButton = document.getElementById("feedButton");
+        var playButton = document.getElementById("playButton");
         feedButton.addEventListener("click", feedPet);
+        playButton.addEventListener("click", playWithPet);
+
+
+
+        function happinessDown() {
+            if (petHappinessValue > 0) {
+                petHappinessValue--;
+                petHappiness.innerHTML = petHappinessValue + "% Happiness";
+            }
+        }
+
+        function playWithPet() {
+            if (petSatiatedValue >= 5) {
+                petSatiatedValue -= 5;
+                petSatiated.innerHTML = petSatiatedValue + "% Satiated";
+                if (petHappinessValue < 100) {
+                    petHappinessValue += 10;
+                    if (petHappinessValue > 100) {
+                        petHappinessValue = 100;
+                    }
+                    petEnjoyment.innerHTML = petHappinessValue + "% Happiness";
+                }
+            }
+        }
 
         function satiationDown() {
             if (petSatiatedValue > 0) {
