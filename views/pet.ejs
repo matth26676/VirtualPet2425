@@ -48,7 +48,10 @@
         }
 
         function feedPet() {
-            petSatiatedValue = 100;
+            petSatiatedValue += 10;
+            if (petSatiatedValue > 100) {
+                petSatiatedValue = 100;
+            }
             petSatiated.innerHTML = petSatiatedValue + "% Satiated";
         }
     </script>
