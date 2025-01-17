@@ -24,7 +24,7 @@
             transform: translate(-50%, -50%);
             width: 200px;
             height: 200px;
-            background-color: lightgreen;
+            background-color: green;
             border: 5px solid;
             border-color: darkgreen;
             border-radius: 15px;
@@ -95,25 +95,28 @@
 
             </div>
             <div id="petContainer">
-                <button class="interactionButton" id="feedButton" onclick="">Feed</button>
-                <button class="interactionButton" id="playButton" onclick="">Play</button>
-                <button class="interactionButton" id="cleanButton" onclick="">Clean</button>
+                <button class="interactionButton" id="feedButton">Feed</button>
+                <button class="interactionButton" id="playButton">Play</button>
+                <button class="interactionButton" id="Button"></button>
             </div>
         </div>
     </div>
     <script>
+        var happinessDecrementInterval = 2000;
         var petMessageContainer = document.getElementById("petMessageContainer");
         var petSatiated = document.getElementById("petSatiated");
         var petHappiness = document.getElementById("petHappiness");
         var petSatiatedValue = 100;
         var petHappinessValue = 100;
-        var PetHungerDecrement = setInterval(satiationDown, 5000);
-        var PetHappinessDecrement = setInterval(happinessDown, 1000);
+        var PetHungerDecrement = setInterval(satiationDown, 10000);
+        var PetHappinessDecrement = setInterval(happinessDown, happinessDecrementInterval);
         var PetStatusUpdate = setInterval(petStatus, 10000);
         var feedButton = document.getElementById("feedButton");
         var playButton = document.getElementById("playButton");
         feedButton.addEventListener("click", feedPet);
         playButton.addEventListener("click", playWithPet);
+        updateHappiness(petHappinessValue);
+        updateSatiation(petSatiatedValue);
 
         function petMessage(message) {
             const messageElement = document.createElement('div');
@@ -139,27 +142,30 @@
         function happinessDown() {
             if (petHappinessValue > 0) {
                 petHappinessValue--;
-                petHappiness.innerHTML = petHappinessValue + "% Happiness";
+                updateHappiness(petHappinessValue);
             }
+            happinessDecrementInterval = 20 * petSatiatedValue;
+            clearInterval(PetHappinessDecrement);
+            PetHappinessDecrement = setInterval(happinessDown, happinessDecrementInterval);
         }
 
         function playWithPet() {
             if (petSatiatedValue >= 5) {
                 petSatiatedValue -= 5;
-                petSatiated.innerHTML = petSatiatedValue + "% Satiated";
-                petMessage('Your pet had fun, but is more hungry now...');
                 petHappinessValue += 10;
                 if (petHappinessValue > 100) {
                     petHappinessValue = 100;
                 }
-                petHappiness.innerHTML = petHappinessValue + "% Happiness";
+                updateHappiness(petHappinessValue);
+                updateSatiation(petSatiatedValue);
+                petMessage('Your pet is a little happier now...');
             }
         }
 
         function satiationDown() {
             if (petSatiatedValue > 0) {
                 petSatiatedValue--;
-                petSatiated.innerHTML = petSatiatedValue + "% Satiated";
+                updateSatiation(petSatiatedValue);
             }
         }
 
@@ -168,8 +174,26 @@
             if (petSatiatedValue > 100) {
                 petSatiatedValue = 100;
             }
-            petSatiated.innerHTML = petSatiatedValue + "% Satiated";
+            updateSatiation(petSatiatedValue);
             petMessage('Your pet is a little less hungry now...');
+        }
+
+        function updateSatiation(petSatiatedValue) {
+            var satiatedGreenColor = 0
+            var satiatedRedColor = 0
+            satiatedGreenColor = Math.round(255 * (petSatiatedValue / 100));
+            satiatedRedColor = 255 - Math.round(satiatedGreenColor / 1.7);
+            petSatiated.style.color = "rgb(" + satiatedRedColor + "," + satiatedGreenColor + ",0)";
+            petSatiated.innerHTML = petSatiatedValue + "% Satiated";
+        }
+
+        function updateHappiness(petHappinessValue) {
+            var happinessGreenColor = 0
+            var happinessRedColor = 0
+            happinessGreenColor = Math.round(255 * (petHappinessValue / 100));
+            happinessRedColor = 255 - Math.round(happinessGreenColor / 1.7);
+            petHappiness.style.color = "rgb(" + happinessRedColor + "," + happinessGreenColor + ",0)";
+            petHappiness.innerHTML = petHappinessValue + "% Happiness";
         }
     </script>
 </body>
