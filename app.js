@@ -17,6 +17,7 @@ const sessionMiddleware = session({
     cookie: { secure: false }
 })
 app.use(sessionMiddleware);
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 io.use((socket, next) => sessionMiddleware(socket.request, {}, next));
 
@@ -39,7 +40,9 @@ app.post('/login', (req, res) => routes.postlogin(req, res, db, crypto));
 
 app.get('/logout', routes.getlogout);
 
-app.get('/pet', routes.getpet);
+app.get('/pet', (req, res) => routes.getpet(req, res, db));
+
+app.post('/pet', (req, res) => routes.postpet(req, res, db));
 
 app.get('/chat', routes.getchat);
 

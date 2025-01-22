@@ -102,12 +102,15 @@
         </div>
     </div>
     <script>
+        var petData = JSON.parse(`<%- petData %>`)
+        console.log(petData);
+        
         var happinessDecrementInterval = 2000;
         var petMessageContainer = document.getElementById("petMessageContainer");
         var petSatiated = document.getElementById("petSatiated");
         var petHappiness = document.getElementById("petHappiness");
-        var petSatiatedValue = 100;
-        var petHappinessValue = 100;
+        var petSatiatedValue = petData.PetHunger;
+        var petHappinessValue = petData.PetHappiness;
         var PetHungerDecrement = setInterval(satiationDown, 10000);
         var PetHappinessDecrement = setInterval(happinessDown, happinessDecrementInterval);
         var PetStatusUpdate = setInterval(petStatus, 10000);
@@ -194,6 +197,23 @@
             happinessRedColor = 255 - Math.round(happinessGreenColor / 1.7);
             petHappiness.style.color = "rgb(" + happinessRedColor + "," + happinessGreenColor + ",0)";
             petHappiness.innerHTML = petHappinessValue + "% Happiness";
+        }
+
+        window.onbeforeunload = function () {
+            console.log("Sending pet data to server...");
+            console.log(petSatiatedValue);
+            console.log(petHappinessValue);
+            
+            fetch('/pet', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                saturation: petSatiatedValue,
+                happiness: petHappinessValue
+            })
+            }).catch(error => console.error('Error:', error));
         }
     </script>
 </body>
