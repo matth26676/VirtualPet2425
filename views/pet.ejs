@@ -78,12 +78,57 @@
             background-color: lightblue;
             overflow-y: scroll;
         }
+
+        #itemsBox {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 400px;
+            height: 600px;
+            background-color: burlywood;
+            display: flex;
+            align-items: left;
+            justify-content: left;
+            font-style: italic;
+            color: chocolate;
+        }
+
+        #itemHeader {
+            position: absolute;
+            width: calc(100% - 12px);
+            height: 12.5%;
+            background-color: moccasin;
+            border: 6px solid;
+            border-color: chocolate;
+            border-radius: 8px;
+            font-size: calc(20px + 4vmin);
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-style: italic;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            color: chocolate;
+        }
+
+        #itemList {
+            position: relative;
+            left: 0;
+            top: 90px;
+            width: 100%;
+            height: 85%;
+            overflow-y: scroll;
+        }
     </style>
 </head>
 
 <body>
     <div id="mainPage">
         <div id="contentBox" style="overflow-y: scroll;">
+            <div id="itemsBox">
+                <div id="itemHeader">Items</div>
+                <div id="itemList"></div>
+            </div>
             <div id="petBox">
                 <img src="https://www.pngitem.com/pimgs/m/146-1468479_my-cute-pet-dog-puppy-dog-png-transparent.png"
                     alt="Pet" style="width: 200px; height: 200px; border-radius: 15px;">
@@ -107,6 +152,8 @@
         
         var happinessDecrementInterval = 2000;
         var petMessageContainer = document.getElementById("petMessageContainer");
+        var itemList = document.getElementById("itemList");
+        getItems();
         var petSatiated = document.getElementById("petSatiated");
         var petHappiness = document.getElementById("petHappiness");
         var petSatiatedValue = petData.PetHunger;
@@ -126,6 +173,28 @@
             messageElement.innerText = message;
             petMessageContainer.appendChild(messageElement);
             messageElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }
+        
+        function getItems() {
+            for (let i = 0; i < 10; i++) {
+                const item = document.createElement('button');
+                item.style.width = "98.5%";
+                item.style.height = "50px";
+                item.style.backgroundColor = "moccasin";
+                item.style.display = "flex";
+                item.style.alignItems = "center";
+                item.style.justifyContent = "center";
+                item.style.border = "2px solid";
+                item.style.borderColor = "chocolate";
+                item.style.borderRadius = "8px";
+                const itemSrc = document.createElement('img');
+                itemSrc.style.width = "40px";
+                itemSrc.style.height = "40px";
+                itemSrc.src = "https://www.pngitem.com/pimgs/m/146-1468479_my-cute-pet-dog-puppy-dog-png-transparent.png";
+                item.appendChild(itemSrc);
+                item.innerText = `Item ${i}`;
+                itemList.appendChild(item);
+            }
         }
 
         function petStatus() {
