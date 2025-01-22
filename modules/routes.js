@@ -91,12 +91,41 @@ function isAuthenticated(req, res, next) {
     }
 }
 
-function getpet(req, res) {
+function getpet(req, res, db) {
     if (isAuthenticated) {
-        res.render('pet');
+        db.get(`SELECT * FROM Users WHERE Username=?;`, req.session.user, (err, user) => {
+            db.get(`SELECT * FROM Pets WHERE OwnerID=?;`,user.UID, (err, row) => {
+                if (err) {
+                    console.log(err);
+                    res.send('Whoops! Something went wrong :(');
+                } else {
+                    res.render('pet', { petData: JSON.stringify(row) });
+                }
+            });
+        });
     } else {
         res.redirect('/login');
     }
+}
+
+function postpet(req, res, db) {
+    console.log(req.body);
+    console.log(req.body.saturation);
+    console.log(req.body.happiness);
+    
+    db.get(`SELECT * FROM Users WHERE Username=?;`, req.session.user, (err, user) => {
+        if (err) {
+            console.log(err);
+            res.send('Whoops! Something went wrong :(');
+        } else {
+            db.run(`UPDATE Pets SET PetHunger=?, PetHappiness=? WHERE OwnerID=?`, [req.body.saturation, req.body.happiness, user.UID], (err) => {
+                if (err) {
+                    console.log(err);
+                    res.send('Whoops! Something went wrong :(');
+                }
+            });
+        }
+    });
 }
 
 
@@ -107,5 +136,6 @@ module.exports = {
     postlogin,
     getlogout,
     getchat,
-    getpet
+    getpet,
+    postpet
 }
