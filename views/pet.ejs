@@ -20,10 +20,10 @@
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
-            top: 50%;
+            top: 40%;
             transform: translate(-50%, -50%);
             width: 200px;
-            height: 200px;
+            height: 400px;
             background-color: green;
             border: 5px solid;
             border-color: darkgreen;
@@ -31,7 +31,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: top;
         }
 
         #petContainer {
@@ -69,7 +69,7 @@
         #petMessageContainer {
             position: absolute;
             left: center;
-            top: 80%;
+            top: 79.45%;
             flex-direction: column;
             align-items: center;
             justify-content: center;
@@ -77,6 +77,28 @@
             height: 100px;
             background-color: lightblue;
             overflow-y: scroll;
+        }
+
+        #itemShop {
+            position: absolute;
+            left: 70%;
+            top: 10%;
+            width: 20%;
+            height: 60%;
+            background-color: moccasin;
+            border: 5px solid;
+            border-color: chocolate;
+            border-radius: 15px;
+        }
+
+        #shopHeader {
+            position: absolute;
+            left: 50%;
+            top: 5%;
+            transform: translate(-50%, -50%);
+            font-size: calc(20px + 4vmin);
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            color: chocolate;
         }
     </style>
 </head>
@@ -89,10 +111,13 @@
                     alt="Pet" style="width: 200px; height: 200px; border-radius: 15px;">
                     <div id="petSatiated"> 100% Satiated</div>
                     <div id="petHappiness"> 100% Happiness</div>
-    
+
             </div>
             <div id="petMessageContainer">
 
+            </div>
+            <div id="itemShop">
+                <div id="shopHeader">Shop</div>
             </div>
             <div id="petContainer">
                 <button class="interactionButton" id="feedButton">Feed</button>
