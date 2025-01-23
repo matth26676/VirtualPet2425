@@ -142,7 +142,7 @@
             <div id="petContainer">
                 <button class="interactionButton" id="feedButton">Feed</button>
                 <button class="interactionButton" id="playButton">Play</button>
-                <button class="interactionButton" id="Button"></button>
+                <button class="interactionButton" id="gameButton">Minigame</button>
             </div>
         </div>
     </div>
@@ -163,10 +163,16 @@
         var PetStatusUpdate = setInterval(petStatus, 10000);
         var feedButton = document.getElementById("feedButton");
         var playButton = document.getElementById("playButton");
+        var gameButton = document.getElementById("gameButton");
         feedButton.addEventListener("click", feedPet);
         playButton.addEventListener("click", playWithPet);
+        gameButton.addEventListener("click", playGame);
         updateHappiness(petHappinessValue);
         updateSatiation(petSatiatedValue);
+
+        function playGame() {
+            window.location.href = "/directionGame";
+        }
 
         function petMessage(message) {
             const messageElement = document.createElement('div');
