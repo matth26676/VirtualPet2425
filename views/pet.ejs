@@ -20,10 +20,10 @@
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
-            top: 50%;
+            top: 40%;
             transform: translate(-50%, -50%);
             width: 200px;
-            height: 200px;
+            height: 400px;
             background-color: green;
             border: 5px solid;
             border-color: darkgreen;
@@ -31,7 +31,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: top;
         }
 
         #petContainer {
@@ -69,7 +69,7 @@
         #petMessageContainer {
             position: absolute;
             left: center;
-            top: 80%;
+            top: 79.45%;
             flex-direction: column;
             align-items: center;
             justify-content: center;
@@ -119,6 +119,40 @@
             height: 85%;
             overflow-y: scroll;
         }
+        #itemShop {
+            position: absolute;
+            left: 70%;
+            top: 10%;
+            width: 20%;
+            height: 60%;
+            background-color: moccasin;
+            border: 5px solid;
+            border-color: chocolate;
+            border-radius: 15px;
+        }
+
+        #shopHeader {
+            position: absolute;
+            left: 50%;
+            top: 5%;
+            transform: translate(-50%, -50%);
+            font-size: calc(20px + 4vmin);
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            color: chocolate;
+        }
+
+        #shopList {
+            position: absolute;
+            left: 0;
+            top: 15%;
+            width: 100%;
+            height: 85%;
+            overflow-y: scroll;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+        }
     </style>
 </head>
 
@@ -132,12 +166,17 @@
             <div id="petBox">
                 <img src="https://www.pngitem.com/pimgs/m/146-1468479_my-cute-pet-dog-puppy-dog-png-transparent.png"
                     alt="Pet" style="width: 200px; height: 200px; border-radius: 15px;">
-                    <div id="petSatiated"> 100% Satiated</div>
-                    <div id="petHappiness"> 100% Happiness</div>
-    
+                    <div id="petSatiated"></div>
+                    <div id="petHappiness"></div>
+                    <div id="Gold"></div>
+
             </div>
             <div id="petMessageContainer">
 
+            </div>
+            <div id="itemShop">
+                <div id="shopHeader">Shop</div>
+                <div id="shopList"></div>
             </div>
             <div id="petContainer">
                 <button class="interactionButton" id="feedButton">Feed</button>
@@ -152,8 +191,13 @@
         
         var happinessDecrementInterval = 2000;
         var petMessageContainer = document.getElementById("petMessageContainer");
+        var itemArray = []; //edit this to reference the items the user has in the database using petData.Items
         var itemList = document.getElementById("itemList");
+        var shopList = document.getElementById("shopList");
         getItems();
+        getShopItems();
+        var gold = document.getElementById("Gold");
+        var goldAmount = 0;
         var petSatiated = document.getElementById("petSatiated");
         var petHappiness = document.getElementById("petHappiness");
         var petSatiatedValue = petData.PetHunger;
@@ -161,8 +205,10 @@
         var PetHungerDecrement = setInterval(satiationDown, 10000);
         var PetHappinessDecrement = setInterval(happinessDown, happinessDecrementInterval);
         var PetStatusUpdate = setInterval(petStatus, 10000);
+        var GoldIncrement = setInterval(increaseGold, 1000);
         var feedButton = document.getElementById("feedButton");
         var playButton = document.getElementById("playButton");
+        gold.innerHTML = `Gold: ${goldAmount}`;
         var gameButton = document.getElementById("gameButton");
         feedButton.addEventListener("click", feedPet);
         playButton.addEventListener("click", playWithPet);
@@ -203,6 +249,47 @@
             }
         }
 
+        function getShopItems() {
+            for (let i = 0; i < 10; i++) {
+                const item = document.createElement('button');
+                item.style.width = "100px";
+                item.style.height = "100px";
+                item.style.backgroundColor = "moccasin";
+                item.style.display = 'flex';
+                item.style.alignItems = "center";
+                item.style.justifyContent = "center";
+                item.style.border = "2px solid";
+                item.style.borderColor = "chocolate";
+                item.style.borderRadius = "8px";
+                item.style.margin = "5px";
+                item.cost = (i+1) * 10; //edit this to reference the cost of the item via the database
+                item.innerText = `Item ${i}`;
+                item.addEventListener('mouseover', function() {
+                    item.style.backgroundColor = "chocolate";
+                    item.style.cursor = "pointer";
+                });
+                item.addEventListener('mouseout', function() {
+                    item.style.backgroundColor = "moccasin";
+                    item.style.cursor = "default";
+                });
+                item.addEventListener('click', function() {
+                    if (goldAmount >= (i+1) * 10) {
+                        goldAmount -= (i+1) * 10;
+                        gold.innerHTML = `Gold: ${goldAmount}`;
+                        petMessage(`You bought item ${i} for ${(i+1) * 10} gold!`);
+                    } else {
+                        petMessage(`You don't have enough gold to buy item ${i}!`);
+                    }
+                });
+                shopList.appendChild(item);
+            }
+        }
+
+        function increaseGold() {
+            goldAmount += 1;
+            gold.innerHTML = `Gold: ${goldAmount}`;
+        }
+        
         function petStatus() {
             let statusMessage = "Pet Status: ";
             if (petSatiatedValue >= 80 && petHappinessValue >= 80) {
@@ -278,6 +365,10 @@
             console.log("Sending pet data to server...");
             console.log(petSatiatedValue);
             console.log(petHappinessValue);
+            let items = [];
+            itemArray.forEach(item => {
+                items.push({ name: item.name, quantity: item.quantity });
+            });
             
             fetch('/pet', {
             method: 'POST',
@@ -286,7 +377,8 @@
             },
             body: JSON.stringify({
                 saturation: petSatiatedValue,
-                happiness: petHappinessValue
+                happiness: petHappinessValue,
+                items: itemArray
             })
             }).catch(error => console.error('Error:', error));
         }
