@@ -75,6 +75,10 @@ function getlogout(req, res) {
     res.render('index');
 }
 
+function getGame(req, res) {
+    res.render('directionGame');
+}
+
 function getchat(req, res) {
     if (isAuthenticated) {
         res.render('chat');
@@ -112,7 +116,7 @@ function postpet(req, res, db) {
     console.log(req.body);
     console.log(req.body.saturation);
     console.log(req.body.happiness);
-    
+
     db.get(`SELECT * FROM Users WHERE Username=?;`, req.session.user, (err, user) => {
         if (err) {
             console.log(err);
@@ -137,5 +141,6 @@ module.exports = {
     getlogout,
     getchat,
     getpet,
-    postpet
+    postpet,
+    getGame
 }
