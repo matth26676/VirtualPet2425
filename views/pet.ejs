@@ -119,6 +119,7 @@
             height: 85%;
             overflow-y: scroll;
         }
+
         #itemShop {
             position: absolute;
             left: 70%;
@@ -166,9 +167,9 @@
             <div id="petBox">
                 <img src="https://www.pngitem.com/pimgs/m/146-1468479_my-cute-pet-dog-puppy-dog-png-transparent.png"
                     alt="Pet" style="width: 200px; height: 200px; border-radius: 15px;">
-                    <div id="petSatiated"></div>
-                    <div id="petHappiness"></div>
-                    <div id="Gold"></div>
+                <div id="petSatiated"></div>
+                <div id="petHappiness"></div>
+                <div id="Gold"></div>
 
             </div>
             <div id="petMessageContainer">
@@ -187,8 +188,10 @@
     </div>
     <script>
         var petData = JSON.parse(`<%- petData %>`)
-        console.log(petData);
-        
+        var inventoryData = JSON.parse(`<%- inventoryData %>`)
+        var itemData = JSON.parse(`<%- itemData %>`)
+
+
         var happinessDecrementInterval = 2000;
         var petMessageContainer = document.getElementById("petMessageContainer");
         var itemArray = []; //edit this to reference the items the user has in the database using petData.Items
@@ -197,7 +200,8 @@
         getItems();
         getShopItems();
         var gold = document.getElementById("Gold");
-        var goldAmount = 0;
+        var goldAmount = petData.Gold;
+        var itemSelected = 'none'
         var petSatiated = document.getElementById("petSatiated");
         var petHappiness = document.getElementById("petHappiness");
         var petSatiatedValue = petData.PetHunger;
@@ -226,10 +230,11 @@
             petMessageContainer.appendChild(messageElement);
             messageElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
-        
+
         function getItems() {
-            for (let i = 0; i < 10; i++) {
+            for (let i in itemData) {
                 const item = document.createElement('button');
+                item.id = `item${i}`;
                 item.style.width = "98.5%";
                 item.style.height = "50px";
                 item.style.backgroundColor = "moccasin";
@@ -244,13 +249,50 @@
                 itemSrc.style.height = "40px";
                 itemSrc.src = "https://www.pngitem.com/pimgs/m/146-1468479_my-cute-pet-dog-puppy-dog-png-transparent.png";
                 item.appendChild(itemSrc);
-                item.innerText = `Item ${i}`;
+                for (let j in inventoryData) {
+                    if (inventoryData[j].itemID == itemData[i].UID) {
+                        itemArray[parseInt(i)] = { name: itemData[i].itemName, quantity: inventoryData[j].itemAmount, hungerAmount: itemData[i].hungerValue, itemID: parseInt(i)+1 };
+                        break;
+                    } else {
+                        itemArray[i] = { name: itemData[i].itemName, quantity: 0, hungerAmount: itemData[i].hungerValue, itemID: parseInt(i)+1 };
+                    }
+                }
+                item.innerText = `${itemArray[i].name} x${itemArray[i].quantity}`;
+                item.addEventListener('click', function () {
+                    if (itemSelected == 'none') {
+                        itemSelected = i;
+                        let selectedItem = document.getElementById(`item${i}`);
+                        selectedItem.style.backgroundColor = "chocolate";
+                    } else if (itemSelected == i) {
+                        itemSelected = 'none';
+                        let selectedItem = document.getElementById(`item${i}`);
+                        selectedItem.style.backgroundColor = "moccasin";
+                    } else {
+                        let selectedItem = document.getElementById(`item${itemSelected}`);
+                        selectedItem.style.backgroundColor = "moccasin";
+                        itemSelected = i;
+                        selectedItem = document.getElementById(`item${i}`);
+                        selectedItem.style.backgroundColor = "chocolate";
+                    }
+                });
                 itemList.appendChild(item);
             }
         }
 
+        function addItems(itemNumber) {
+            let item = document.getElementById(`item${itemNumber}`);
+            itemArray[itemNumber].quantity++;
+            item.innerText = `${itemArray[itemNumber].name} x${itemArray[itemNumber].quantity}`;
+        }
+
+        function reduceItems(itemNumber) {
+            let item = document.getElementById(`item${itemNumber}`);
+            itemArray[itemNumber].quantity--;
+            item.innerText = `${itemArray[itemNumber].name} x${itemArray[itemNumber].quantity}`;
+        }
+
         function getShopItems() {
-            for (let i = 0; i < 10; i++) {
+            for (let i in itemData) {
                 const item = document.createElement('button');
                 item.style.width = "100px";
                 item.style.height = "100px";
@@ -262,21 +304,22 @@
                 item.style.borderColor = "chocolate";
                 item.style.borderRadius = "8px";
                 item.style.margin = "5px";
-                item.cost = (i+1) * 10; //edit this to reference the cost of the item via the database
-                item.innerText = `Item ${i}`;
-                item.addEventListener('mouseover', function() {
+                item.cost = (i + 1) * 10; //edit this to reference the cost of the item via the database
+                item.innerHTML = `${itemArray[i].name} <br> Cost: ${itemData[i].price}`;
+                item.addEventListener('mouseover', function () {
                     item.style.backgroundColor = "chocolate";
                     item.style.cursor = "pointer";
                 });
-                item.addEventListener('mouseout', function() {
+                item.addEventListener('mouseout', function () {
                     item.style.backgroundColor = "moccasin";
                     item.style.cursor = "default";
                 });
-                item.addEventListener('click', function() {
-                    if (goldAmount >= (i+1) * 10) {
-                        goldAmount -= (i+1) * 10;
+                item.addEventListener('click', function () {
+                    if (goldAmount >= itemData[i].price) {
+                        goldAmount -= itemData[i].price;
                         gold.innerHTML = `Gold: ${goldAmount}`;
-                        petMessage(`You bought item ${i} for ${(i+1) * 10} gold!`);
+                        petMessage(`You bought item ${i} for ${(i + 1) * 10} gold!`);
+                        addItems(i);
                     } else {
                         petMessage(`You don't have enough gold to buy item ${i}!`);
                     }
@@ -289,7 +332,7 @@
             goldAmount += 1;
             gold.innerHTML = `Gold: ${goldAmount}`;
         }
-        
+
         function petStatus() {
             let statusMessage = "Pet Status: ";
             if (petSatiatedValue >= 80 && petHappinessValue >= 80) {
@@ -335,12 +378,21 @@
         }
 
         function feedPet() {
-            petSatiatedValue += 10;
-            if (petSatiatedValue > 100) {
-                petSatiatedValue = 100;
+            if (itemSelected != 'none') {
+                if (itemArray[itemSelected].quantity > 0) {
+                    reduceItems(itemSelected);
+                    petSatiatedValue += itemArray[itemSelected].hungerAmount;
+                    if (petSatiatedValue > 100) {
+                        petSatiatedValue = 100;
+                    }
+                    updateSatiation(petSatiatedValue);
+                    petMessage('Your pet is a little less hungry now...');
+                } else {
+                    petMessage('You do not have any of that item to feed your pet!');
+                }
+            } else {
+                petMessage('You must select an item to feed your pet!');
             }
-            updateSatiation(petSatiatedValue);
-            petMessage('Your pet is a little less hungry now...');
         }
 
         function updateSatiation(petSatiatedValue) {
@@ -349,7 +401,7 @@
             satiatedGreenColor = Math.round(255 * (petSatiatedValue / 100));
             satiatedRedColor = 255 - Math.round(satiatedGreenColor / 1.7);
             petSatiated.style.color = "rgb(" + satiatedRedColor + "," + satiatedGreenColor + ",0)";
-            petSatiated.innerHTML = petSatiatedValue + "% Satiated";
+            petSatiated.innerHTML = petSatiatedValue + "% Hunger";
         }
 
         function updateHappiness(petHappinessValue) {
@@ -367,19 +419,20 @@
             console.log(petHappinessValue);
             let items = [];
             itemArray.forEach(item => {
-                items.push({ name: item.name, quantity: item.quantity });
+                items.push({ name: item.name, quantity: item.quantity, itemID: item.itemID });
             });
-            
+
             fetch('/pet', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                saturation: petSatiatedValue,
-                happiness: petHappinessValue,
-                items: itemArray
-            })
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    saturation: petSatiatedValue,
+                    happiness: petHappinessValue,
+                    items: itemArray,
+                    gold: goldAmount
+                })
             }).catch(error => console.error('Error:', error));
         }
     </script>
