@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet</title>
+
+    <style>
+        #mainPage {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: cornflowerblue;
+        }
+
+        #petBox {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 40%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 400px;
+            background-color: green;
+            border: 5px solid;
+            border-color: darkgreen;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: top;
+        }
+
+        #petContainer {
+            position: absolute;
+            left: center;
+            top: 90%;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-evenly;
+            display: flex;
+            width: 100%;
+            height: 10%;
+            background-color: burlywood;
+        }
+
+        .interactionButton {
+            position: relative;
+            width: 30%;
+            height: 90%;
+            top: center;
+            background-color: moccasin;
+            border: 5px solid;
+            border-color: chocolate;
+            border-radius: 15px;
+            font-size: calc(20px + 4vmin);
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-style: italic;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            color: chocolate;
+        }
+
+        #petMessageContainer {
+            position: absolute;
+            left: center;
+            top: 79.45%;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100px;
+            background-color: lightblue;
+            overflow-y: scroll;
+        }
+
+        #itemsBox {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 400px;
+            height: 600px;
+            background-color: burlywood;
+            display: flex;
+            align-items: left;
+            justify-content: left;
+            font-style: italic;
+            color: chocolate;
+        }
+
+        #itemHeader {
+            position: absolute;
+            width: calc(100% - 12px);
+            height: 12.5%;
+            background-color: moccasin;
+            border: 6px solid;
+            border-color: chocolate;
+            border-radius: 8px;
+            font-size: calc(20px + 4vmin);
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-style: italic;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            color: chocolate;
+        }
+
+        #itemList {
+            position: relative;
+            left: 0;
+            top: 90px;
+            width: 100%;
+            height: 85%;
+            overflow-y: scroll;
+        }
+        #itemShop {
+            position: absolute;
+            left: 70%;
+            top: 10%;
+            width: 20%;
+            height: 60%;
+            background-color: moccasin;
+            border: 5px solid;
+            border-color: chocolate;
+            border-radius: 15px;
+        }
+
+        #shopHeader {
+            position: absolute;
+            left: 50%;
+            top: 5%;
+            transform: translate(-50%, -50%);
+            font-size: calc(20px + 4vmin);
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            color: chocolate;
+        }
+
+        #shopList {
+            position: absolute;
+            left: 0;
+            top: 15%;
+            width: 100%;
+            height: 85%;
+            overflow-y: scroll;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="mainPage">
+        <div id="contentBox" style="overflow-y: scroll;">
+            <div id="itemsBox">
+                <div id="itemHeader">Items</div>
+                <div id="itemList"></div>
+            </div>
+            <div id="petBox">
+                <img src="https://www.pngitem.com/pimgs/m/146-1468479_my-cute-pet-dog-puppy-dog-png-transparent.png"
+                    alt="Pet" style="width: 200px; height: 200px; border-radius: 15px;">
+                    <div id="petSatiated"></div>
+                    <div id="petHappiness"></div>
+                    <div id="Gold"></div>
+
+            </div>
+            <div id="petMessageContainer">
+
+            </div>
+            <div id="itemShop">
+                <div id="shopHeader">Shop</div>
+                <div id="shopList"></div>
+            </div>
+            <div id="petContainer">
+                <button class="interactionButton" id="feedButton">Feed</button>
+                <button class="interactionButton" id="playButton">Play</button>
+                <button class="interactionButton" id="Button"></button>
+            </div>
+        </div>
+    </div>
+    <script>
+        var petData = JSON.parse(`<%- petData %>`)
+        console.log(petData);
+        
+        var happinessDecrementInterval = 2000;
+        var petMessageContainer = document.getElementById("petMessageContainer");
+        var itemArray = []; //edit this to reference the items the user has in the database using petData.Items
+        var itemList = document.getElementById("itemList");
+        var shopList = document.getElementById("shopList");
+        getItems();
+        getShopItems();
+        var gold = document.getElementById("Gold");
+        var goldAmount = 0;
+        var petSatiated = document.getElementById("petSatiated");
+        var petHappiness = document.getElementById("petHappiness");
+        var petSatiatedValue = petData.PetHunger;
+        var petHappinessValue = petData.PetHappiness;
+        var PetHungerDecrement = setInterval(satiationDown, 10000);
+        var PetHappinessDecrement = setInterval(happinessDown, happinessDecrementInterval);
+        var PetStatusUpdate = setInterval(petStatus, 10000);
+        var GoldIncrement = setInterval(increaseGold, 1000);
+        var feedButton = document.getElementById("feedButton");
+        var playButton = document.getElementById("playButton");
+        gold.innerHTML = `Gold: ${goldAmount}`;
+        feedButton.addEventListener("click", feedPet);
+        playButton.addEventListener("click", playWithPet);
+        updateHappiness(petHappinessValue);
+        updateSatiation(petSatiatedValue);
+
+        function petMessage(message) {
+            const messageElement = document.createElement('div');
+            messageElement.innerText = message;
+            petMessageContainer.appendChild(messageElement);
+            messageElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }
+        
+        function getItems() {
+            for (let i = 0; i < 10; i++) {
+                const item = document.createElement('button');
+                item.style.width = "98.5%";
+                item.style.height = "50px";
+                item.style.backgroundColor = "moccasin";
+                item.style.display = "flex";
+                item.style.alignItems = "center";
+                item.style.justifyContent = "center";
+                item.style.border = "2px solid";
+                item.style.borderColor = "chocolate";
+                item.style.borderRadius = "8px";
+                const itemSrc = document.createElement('img');
+                itemSrc.style.width = "40px";
+                itemSrc.style.height = "40px";
+                itemSrc.src = "https://www.pngitem.com/pimgs/m/146-1468479_my-cute-pet-dog-puppy-dog-png-transparent.png";
+                item.appendChild(itemSrc);
+                item.innerText = `Item ${i}`;
+                itemList.appendChild(item);
+            }
+        }
+
+        function getShopItems() {
+            for (let i = 0; i < 10; i++) {
+                const item = document.createElement('button');
+                item.style.width = "100px";
+                item.style.height = "100px";
+                item.style.backgroundColor = "moccasin";
+                item.style.display = 'flex';
+                item.style.alignItems = "center";
+                item.style.justifyContent = "center";
+                item.style.border = "2px solid";
+                item.style.borderColor = "chocolate";
+                item.style.borderRadius = "8px";
+                item.style.margin = "5px";
+                item.cost = (i+1) * 10; //edit this to reference the cost of the item via the database
+                item.innerText = `Item ${i}`;
+                item.addEventListener('mouseover', function() {
+                    item.style.backgroundColor = "chocolate";
+                    item.style.cursor = "pointer";
+                });
+                item.addEventListener('mouseout', function() {
+                    item.style.backgroundColor = "moccasin";
+                    item.style.cursor = "default";
+                });
+                item.addEventListener('click', function() {
+                    if (goldAmount >= (i+1) * 10) {
+                        goldAmount -= (i+1) * 10;
+                        gold.innerHTML = `Gold: ${goldAmount}`;
+                        petMessage(`You bought item ${i} for ${(i+1) * 10} gold!`);
+                    } else {
+                        petMessage(`You don't have enough gold to buy item ${i}!`);
+                    }
+                });
+                shopList.appendChild(item);
+            }
+        }
+
+        function increaseGold() {
+            goldAmount += 1;
+            gold.innerHTML = `Gold: ${goldAmount}`;
+        }
+        
+        function petStatus() {
+            let statusMessage = "Pet Status: ";
+            if (petSatiatedValue >= 80 && petHappinessValue >= 80) {
+                statusMessage += "Your pet is very happy and well-fed!";
+            } else if (petSatiatedValue >= 80) {
+                statusMessage += "Your pet is well-fed but could use more playtime.";
+            } else if (petHappinessValue >= 80) {
+                statusMessage += "Your pet is happy but could use more food.";
+            } else {
+                statusMessage += "Your pet needs more attention.";
+            }
+            petMessage(statusMessage);
+        }
+
+        function happinessDown() {
+            if (petHappinessValue > 0) {
+                petHappinessValue--;
+                updateHappiness(petHappinessValue);
+            }
+            happinessDecrementInterval = 20 * petSatiatedValue;
+            clearInterval(PetHappinessDecrement);
+            PetHappinessDecrement = setInterval(happinessDown, happinessDecrementInterval);
+        }
+
+        function playWithPet() {
+            if (petSatiatedValue >= 5) {
+                petSatiatedValue -= 5;
+                petHappinessValue += 10;
+                if (petHappinessValue > 100) {
+                    petHappinessValue = 100;
+                }
+                updateHappiness(petHappinessValue);
+                updateSatiation(petSatiatedValue);
+                petMessage('Your pet is a little happier now...');
+            }
+        }
+
+        function satiationDown() {
+            if (petSatiatedValue > 0) {
+                petSatiatedValue--;
+                updateSatiation(petSatiatedValue);
+            }
+        }
+
+        function feedPet() {
+            petSatiatedValue += 10;
+            if (petSatiatedValue > 100) {
+                petSatiatedValue = 100;
+            }
+            updateSatiation(petSatiatedValue);
+            petMessage('Your pet is a little less hungry now...');
+        }
+
+        function updateSatiation(petSatiatedValue) {
+            var satiatedGreenColor = 0
+            var satiatedRedColor = 0
+            satiatedGreenColor = Math.round(255 * (petSatiatedValue / 100));
+            satiatedRedColor = 255 - Math.round(satiatedGreenColor / 1.7);
+            petSatiated.style.color = "rgb(" + satiatedRedColor + "," + satiatedGreenColor + ",0)";
+            petSatiated.innerHTML = petSatiatedValue + "% Satiated";
+        }
+
+        function updateHappiness(petHappinessValue) {
+            var happinessGreenColor = 0
+            var happinessRedColor = 0
+            happinessGreenColor = Math.round(255 * (petHappinessValue / 100));
+            happinessRedColor = 255 - Math.round(happinessGreenColor / 1.7);
+            petHappiness.style.color = "rgb(" + happinessRedColor + "," + happinessGreenColor + ",0)";
+            petHappiness.innerHTML = petHappinessValue + "% Happiness";
+        }
+
+        window.onbeforeunload = function () {
+            console.log("Sending pet data to server...");
+            console.log(petSatiatedValue);
+            console.log(petHappinessValue);
+            let items = [];
+            itemArray.forEach(item => {
+                items.push({ name: item.name, quantity: item.quantity });
+            });
+            
+            fetch('/pet', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                saturation: petSatiatedValue,
+                happiness: petHappinessValue,
+                items: itemArray
+            })
+            }).catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+
+</html>

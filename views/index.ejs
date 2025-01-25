@@ -20,13 +20,13 @@
             const Username = document.createElement('h1');
             Username.textContent = `Welcome ${user}!`;
             document.body.appendChild(Username);
-            const chatLink = document.createElement('a');
-            chatLink.href = '/chat';
-            chatLink.textContent = 'Chat';
-            document.body.appendChild(chatLink);
+            const petLink = document.createElement('a');
+            petLink.href = '/pet';
+            petLink.textContent = 'Take care of your pet';
+            document.body.appendChild(petLink);
         } else {
             const Guest = document.createElement('h1');
-            Guest.textContent = 'Welcome! Please login to use the Chat page';
+            Guest.textContent = 'Welcome! Please login to take care of your pet';
             document.body.appendChild(Guest);
             const loginLink = document.createElement('a');
             loginLink.href = '/login';
