@@ -75,6 +75,10 @@ function getlogout(req, res) {
     res.render('index');
 }
 
+function getGame(req, res) {
+    res.render('directionGame');
+}
+
 function getchat(req, res) {
     if (isAuthenticated) {
         res.render('chat');
@@ -137,5 +141,6 @@ module.exports = {
     getlogout,
     getchat,
     getpet,
-    postpet
+    postpet,
+    getGame
 }

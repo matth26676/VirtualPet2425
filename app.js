@@ -46,6 +46,8 @@ app.post('/pet', (req, res) => routes.postpet(req, res, db));
 
 app.get('/chat', routes.getchat);
 
+app.get('/directionGame', routes.getGame);
+
 io.on('connection', (socket) => sockets.connection(socket, io));
 
 app.use(express.static(path.join(__dirname, 'public')));
