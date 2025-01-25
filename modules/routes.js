@@ -24,7 +24,7 @@ function postlogin(req, res, db, crypto) {
                 } else if (!row) {
                     // Create a new salt(key) for the user
                     const salt = crypto.randomBytes(16).toString('hex')
-    
+
                     // Uses salt to hash password
                     crypto.pbkdf2(req.body.pass, salt, 1000, 64, 'sha512', (err, derivedKey) => {
                         if (err) {
@@ -58,8 +58,8 @@ function postlogin(req, res, db, crypto) {
                             }
                         }
                     })
-    
-    
+
+
                 }
             })
         } else {
@@ -68,7 +68,7 @@ function postlogin(req, res, db, crypto) {
     } else {
         console.log('An Error has occured');
     }
-    
+
 }
 
 function getlogout(req, res) {
@@ -98,13 +98,32 @@ function isAuthenticated(req, res, next) {
 function getpet(req, res, db) {
     if (isAuthenticated) {
         db.get(`SELECT * FROM Users WHERE Username=?;`, req.session.user, (err, user) => {
-            db.get(`SELECT * FROM Pets WHERE OwnerID=?;`,user.UID, (err, row) => {
+            db.get(`SELECT * FROM Pets WHERE OwnerID=?;`, user.UID, (err, petStatData) => {
                 if (err) {
                     console.log(err);
                     res.send('Whoops! Something went wrong :(');
                 } else {
-                    res.render('pet', { petData: JSON.stringify(row) });
+                    var petStatData = JSON.stringify(petStatData);
                 }
+                db.all(`SELECT * FROM INVENTORY WHERE OwnerID=?;`, user.UID, (err, inventoryItemData) => {
+                    if (err) {
+                        console.log(err);
+                        res.send('Whoops! Something went wrong :(');
+                    } else {
+                        var inventoryItemData = JSON.stringify(inventoryItemData);
+                        console.log(inventoryItemData);
+
+                    }
+                    db.all(`SELECT * FROM Items;`, (err, row) => {
+                        if (err) {
+                            console.log(err);
+                            res.send('Whoops! Something went wrong :(');
+                        } else {
+                            var itemData = JSON.stringify(row);
+                        }
+                        res.render('pet', { petData: petStatData, inventoryData: inventoryItemData, itemData: itemData });
+                    });
+                });
             });
         });
     } else {
@@ -113,21 +132,41 @@ function getpet(req, res, db) {
 }
 
 function postpet(req, res, db) {
-    console.log(req.body);
-    console.log(req.body.saturation);
-    console.log(req.body.happiness);
-
     db.get(`SELECT * FROM Users WHERE Username=?;`, req.session.user, (err, user) => {
         if (err) {
             console.log(err);
             res.send('Whoops! Something went wrong :(');
         } else {
-            db.run(`UPDATE Pets SET PetHunger=?, PetHappiness=? WHERE OwnerID=?`, [req.body.saturation, req.body.happiness, user.UID], (err) => {
+            db.run(`UPDATE Pets SET PetHunger=?, PetHappiness=?, Gold=? WHERE OwnerID=?`, [req.body.saturation, req.body.happiness, req.body.gold ,user.UID], (err) => {
                 if (err) {
                     console.log(err);
                     res.send('Whoops! Something went wrong :(');
                 }
             });
+            for (let i in req.body.items) {
+                db.get(`SELECT * FROM Inventory WHERE OwnerID=? AND itemID=?;`, [user.UID, req.body.items[i].itemID], (err, row) => {
+                    if (err) {
+                        console.log(err);
+                        res.send('Whoops! Something went wrong :(');
+                    } else {
+                        if (!row) {
+                            db.run(`INSERT INTO Inventory(OwnerID, itemID, itemAmount) VALUES(?, ?, ?)`, [user.UID, req.body.items[i].itemID, req.body.items[i].quantity], (err) => {
+                                if (err) {
+                                    console.log(err);
+                                    res.send('Whoops! Something went wrong :(');
+                                }
+                            });
+                        } else {
+                            db.run(`UPDATE Inventory SET itemAmount=? WHERE OwnerID=? AND ItemID=?`, [req.body.items[i].quantity, user.UID, req.body.items[i].itemID], (err) => {
+                                if (err) {
+                                    console.log(err);
+                                    res.send('Whoops! Something went wrong :(');
+                                }
+                            });
+                        }
+                    }
+                });
+            }
         }
     });
 }
