@@ -4,8 +4,8 @@ const port = 3000;
 const session = require('express-session');
 const SQLiteStore = require('connect-sqlite3')(session);
 const server = app.listen(port, () => console.log(`Server started on port ${port}`));
-const socketIo = require('socket.io');
-const io = socketIo(server);
+// const socketIo = require('socket.io');
+// const io = socketIo(server);
 const sqlite3 = require('sqlite3');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
@@ -19,10 +19,10 @@ const sessionMiddleware = session({
 app.use(sessionMiddleware);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-io.use((socket, next) => sessionMiddleware(socket.request, {}, next));
+// io.use((socket, next) => sessionMiddleware(socket.request, {}, next));
 
 const routes = require('./modules/routes');
-const sockets = require('./modules/socket');
+// const sockets = require('./modules/socket');
 const path = require('path');
 const db = new sqlite3.Database('data/Database.db', (err) => {
     if (err) {
@@ -48,6 +48,6 @@ app.get('/chat', routes.getchat);
 
 app.get('/directionGame', routes.getGame);
 
-io.on('connection', (socket) => sockets.connection(socket, io));
+// io.on('connection', (socket) => sockets.connection(socket, io));
 
 app.use(express.static(path.join(__dirname, 'public')));
