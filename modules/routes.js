@@ -38,7 +38,37 @@ function postlogin(req, res, db, crypto) {
                                     res.send('Whoops! Something went wrong :(')
                                 } else {
                                     req.session.user = req.body.user;
-                                    res.render('/');
+                                    db.get(`SELECT * FROM Users WHERE Username=?;`, req.body.user, (err, user) => {
+                                        if (err) {
+                                            console.log(err);
+                                            res.send('Whoops! Something went wrong :(');
+                                        } else {
+                                            db.run(`INSERT INTO Pets(OwnerID, PetName, PetHunger, PetHappiness, Gold) VALUES(?, ?, 100, 100, 0)`, [user.UID, 'DefaultPetName'], (err) => {
+                                                if (err) {
+                                                    console.log(err);
+                                                    res.send('Whoops! Something went wrong :(');
+                                                }
+                                            });
+                                            db.get(`SELECT COUNT(*) as count FROM Items`, (err, result) => {
+                                                if (err) {
+                                                    console.log(err);
+                                                    res.send('Whoops! Something went wrong :(');
+                                                } else {
+                                                    let itemCount = result.count;
+                                                    for (let i = 1; i <= itemCount; i++) {
+                                                        db.run(`INSERT INTO Inventory(OwnerID, itemID, itemAmount) VALUES(?, ?, 0)`, user.UID, i, (err) => {
+                                                            if (err) {
+                                                                console.log(err);
+                                                                res.send('Whoops! Something went wrong :(');
+                                                            } else {
+                                                                res.redirect('/');
+                                                            }
+                                                        });
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    });
                                 }
                             })
                         }

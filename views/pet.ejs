@@ -262,19 +262,28 @@
                     if (itemSelected == 'none') {
                         itemSelected = i;
                         let selectedItem = document.getElementById(`item${i}`);
-                        selectedItem.style.backgroundColor = "chocolate";
                     } else if (itemSelected == i) {
                         itemSelected = 'none';
                         let selectedItem = document.getElementById(`item${i}`);
-                        selectedItem.style.backgroundColor = "moccasin";
                     } else {
                         let selectedItem = document.getElementById(`item${itemSelected}`);
-                        selectedItem.style.backgroundColor = "moccasin";
                         itemSelected = i;
                         selectedItem = document.getElementById(`item${i}`);
-                        selectedItem.style.backgroundColor = "chocolate";
                     }
                 });
+                item.addEventListener('mouseover', function () {
+                        item.style.backgroundColor = "chocolate";
+                        item.style.cursor = "pointer";
+                });
+                item.addEventListener('mouseout', function () {
+                    if (itemSelected != i) {
+                        item.style.backgroundColor = "moccasin";
+                        item.style.cursor = "default";
+                    }
+                });
+                if (itemSelected == i) {
+                    item.style.backgroundColor = "chocolate";
+                }
                 itemList.appendChild(item);
             }
         }
